@@ -1,18 +1,16 @@
-// Todo type matching backend model
-export interface Todo {
-    id: number;
-    title: string;
-    completed: boolean;
-    created_at: string;
-    updated_at: string;
+// Shared TypeScript types
+
+// API Response wrapper
+export interface ApiResponse<T> {
+    data: T;
+    message?: string;
 }
 
-export interface CreateTodoDto {
-    title: string;
-    completed: boolean;
+// Error response from backend
+export interface ApiError {
+    error: string;
+    type?: string;
+    details?: Record<string, string>;
 }
 
-export interface UpdateTodoDto {
-    title: string;
-    completed: boolean;
-}
+// Add your module-specific types here
