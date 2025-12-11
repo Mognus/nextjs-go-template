@@ -1,4 +1,4 @@
-module PROJECT_NAME
+module template
 
 go 1.25
 
@@ -7,10 +7,13 @@ require (
 	github.com/joho/godotenv v1.5.1
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/gorm v1.31.1
+	template/modules/auth v0.0.0
+	template/modules/todo v0.0.0
 )
 
 require (
 	github.com/andybalholm/brotli v1.1.0 // indirect
+	github.com/golang-jwt/jwt/v5 v5.2.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
@@ -30,11 +33,12 @@ require (
 	golang.org/x/sync v0.10.0 // indirect
 	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
+	template/modules/core v0.0.0 // indirect
 )
 
-// Module imports (add as needed):
-// require (
-//     github.com/yourcompany/backend-core v1.0.0
-//     github.com/yourcompany/auth-module v1.0.0
-//     github.com/yourcompany/todo-module v1.0.0
-// )
+// Local module replacements
+replace template/modules/auth => ../modules/auth-module/backend
+
+replace template/modules/core => ../modules/backend-core/backend
+
+replace template/modules/todo => ../modules/todo-module/backend

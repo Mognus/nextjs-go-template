@@ -19,7 +19,8 @@
             }
         ],
         "paths": {
-            "@/*": ["./*"]
+            "@/*": ["./*"],
+            "@/modules/*": ["./modules/*", "../modules/*"]
         }
     },
     "include": [
@@ -28,7 +29,9 @@
         "**/*.tsx",
         ".next/types/**/*.ts",
         ".next/dev/types/**/*.ts",
-        "**/*.mts"
+        "**/*.mts",
+        "../modules/**/frontend/**/*.ts",
+        "../modules/**/frontend/**/*.tsx"
     ],
     "exclude": ["node_modules"]
 }

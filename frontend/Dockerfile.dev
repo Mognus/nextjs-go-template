@@ -4,14 +4,17 @@ FROM node:22-alpine
 # Set working directory
 WORKDIR /app
 
+# Copy modules first (needed for module resolution)
+COPY modules /app/modules
+
 # Copy package files
-COPY package*.json ./
+COPY frontend/package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy source code
-COPY . .
+# Copy frontend source code
+COPY frontend/ .
 
 # Expose port
 EXPOSE 3000

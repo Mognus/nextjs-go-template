@@ -24,8 +24,8 @@ services:
   # Go Backend
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: backend/Dockerfile.dev
     container_name: PROJECT_NAME-backend
     env_file:
       - ./backend/.env
@@ -40,6 +40,7 @@ services:
       - "8080:8080"
     volumes:
       - ./backend:/app
+      - ./modules:/modules
       - go_modules:/go/pkg/mod
     depends_on:
       postgres:
@@ -51,8 +52,8 @@ services:
   # Next.js Frontend
   frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: frontend/Dockerfile.dev
     container_name: PROJECT_NAME-frontend
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:8080/api
@@ -60,6 +61,7 @@ services:
       - "3000:3000"
     volumes:
       - ./frontend:/app
+      - ./modules:/app/modules
       - /app/node_modules
       - /app/.next
     depends_on:

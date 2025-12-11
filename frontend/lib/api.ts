@@ -38,8 +38,3 @@ api.interceptors.response.use(
         return Promise.reject(new Error(message));
     }
 );
-
-// GENERATOR:INJECT:EXPORTS
-// Feature API exports will be injected here
-// export * from '@/features/auth/api';
-// END:GENERATOR:INJECT:EXPORTS

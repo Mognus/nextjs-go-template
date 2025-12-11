@@ -1,0 +1,9 @@
+[submodule "modules/auth-module"]
+	path = modules/auth-module
+	url = git@github.com:Mognus/fiber-user-management.git
+[submodule "modules/backend-core"]
+	path = modules/backend-core
+	url = git@github.com:Mognus/fiber-core.git
+[submodule "modules/todo-module"]
+	path = modules/todo-module
+	url = git@github.com:Mognus/fiber-todo-test-plugin.git
