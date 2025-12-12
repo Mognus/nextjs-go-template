@@ -1,6 +1,6 @@
 # Fullstack Template (Next.js + Go Fiber)
 
-A production-ready fullstack template with modular architecture using Git Subtrees.
+A production-ready fullstack template with modular architecture using Git Submodules.
 
 ---
 
@@ -8,8 +8,8 @@ A production-ready fullstack template with modular architecture using Git Subtre
 
 - [Quick Start](#-quick-start)
 - [Architecture Overview](#-architecture-overview)
-- [Git Subtree Workflow](#-git-subtree-workflow)
-  - [What are Git Subtrees?](#what-are-git-subtrees)
+- [Git Submodule Workflow](#-git-submodule-workflow)
+  - [What are Git Submodules?](#what-are-git-submodules)
   - [Adding Modules](#adding-modules)
   - [Updating Modules](#updating-modules)
   - [Contributing Back to Modules](#contributing-back-to-modules)
@@ -37,14 +37,17 @@ A production-ready fullstack template with modular architecture using Git Subtre
 git clone https://github.com/yourcompany/your-fork.git
 cd your-fork
 
-# 3. Create a customer branch
+# 3. Initialize submodules
+git submodule update --init --recursive
+
+# 4. Create a customer branch
 git checkout -b customer/kunde-a
 
-# 4. Install dependencies
+# 5. Install dependencies
 cd backend && go mod download && cd ..
 cd frontend && npm install && cd ..
 
-# 5. Start development
+# 6. Start development
 make dev
 ```
 
@@ -52,7 +55,7 @@ make dev
 
 ## 🏗️ Architecture Overview
 
-This template uses a **modular architecture** with **Git Subtrees** to manage reusable backend and frontend modules.
+This template uses a **modular architecture** with **Git Submodules** to manage reusable backend and frontend modules.
 
 ```
 template/
@@ -64,14 +67,14 @@ template/
 │   ├── app/               # Next.js app directory
 │   ├── components/        # React components
 │   └── package.json
-├── modules/               # Git Subtree modules
-│   ├── auth-module/       # Authentication module (Subtree)
+├── modules/               # Git Submodule modules
+│   ├── auth-module/       # Authentication module (Submodule)
 │   │   ├── backend/       # Go backend code
 │   │   └── frontend/      # React components
-│   ├── todo-module/       # Todo CRUD module (Subtree)
+│   ├── todo-module/       # Todo CRUD module (Submodule)
 │   │   ├── backend/
 │   │   └── frontend/
-│   └── backend-core/      # Core utilities (Subtree)
+│   └── backend-core/      # Core utilities (Submodule)
 │       └── backend/
 └── docker-compose.dev.yml
 ```
@@ -80,65 +83,98 @@ template/
 
 - **Template Repository**: The base template (this repo) that can be forked for customer projects
 - **Module Repositories**: Separate Git repositories containing reusable modules
-- **Git Subtrees**: Mechanism to include module repositories as subdirectories in the template
+- **Git Submodules**: Mechanism to include module repositories as subdirectories in the template
 - **Customer Projects**: Forks of the template, customized for specific customers
 
 ---
 
-## 🌳 Git Subtree Workflow
+## 🌳 Git Submodule Workflow
 
-### What are Git Subtrees?
+### What are Git Submodules?
 
-Git Subtrees allow you to include another repository as a subdirectory in your project. Unlike submodules:
+Git Submodules allow you to include another repository as a subdirectory in your project. Key characteristics:
 
-- ✅ **No special commands needed** to clone (just `git clone`)
-- ✅ **Code is physically present** in the repository
-- ✅ **Bidirectional sync** - pull updates from module repo, push changes back
-- ✅ **Customer projects stay independent** - modules become normal code after forking
+- ✅ **Pin specific versions** - Each submodule points to a specific commit
+- ✅ **Independent development** - Modules can be developed separately
+- ✅ **Flexible versioning** - Different projects can use different module versions
+- ✅ **Direct editing** - Edit module code directly and push to module repo
+- ⚠️ **Requires init** - After cloning, run `git submodule update --init --recursive`
 
 ### Adding Modules
 
-To add a new module as a subtree:
+To add a new module as a submodule:
 
 ```bash
 # Syntax
-git subtree add --prefix modules/<module-name> <repo-url> <branch> --squash
+git submodule add <repo-url> modules/<module-name>
 
 # Example: Add auth module
-git subtree add --prefix modules/auth-module https://github.com/yourcompany/fiber-auth-module main --squash
+git submodule add git@github.com:yourcompany/fiber-auth-module.git modules/auth-module
+
+# Commit the .gitmodules file and submodule
+git add .gitmodules modules/auth-module
+git commit -m "Add auth-module as submodule"
+git push
 ```
 
-**Parameters:**
-- `--prefix`: Where to place the module in your repository
-- `<repo-url>`: URL of the module repository
-- `<branch>`: Branch to pull from (usually `main`)
-- `--squash`: Squash commits for cleaner history
+**What happens:**
+- Creates `.gitmodules` file with submodule configuration
+- Clones the module repository into `modules/auth-module`
+- Creates a commit pointer to the current module commit
 
 ### Updating Modules
 
-Pull latest changes from a module repository:
+Pull latest changes from module repositories:
 
 ```bash
-# Update auth module
-git subtree pull --prefix modules/auth-module https://github.com/yourcompany/fiber-auth-module main --squash
+# Update a specific module to latest commit
+cd modules/auth-module
+git pull origin main
+cd ../..
+git add modules/auth-module
+git commit -m "Update auth-module to latest version"
+git push
 
-# Update all modules
-git subtree pull --prefix modules/auth-module https://github.com/yourcompany/fiber-auth-module main --squash
-git subtree pull --prefix modules/todo-module https://github.com/yourcompany/fiber-todo-module main --squash
-git subtree pull --prefix modules/backend-core https://github.com/yourcompany/backend-core main --squash
+# Update all modules to their latest commits
+git submodule update --remote
+git add modules/
+git commit -m "Update all modules to latest versions"
+git push
+```
+
+### Switching Module Versions
+
+Pin a module to a specific version/tag/commit:
+
+```bash
+# Switch to a specific version
+cd modules/auth-module
+git checkout v1.5.0  # or specific commit hash
+cd ../..
+git add modules/auth-module
+git commit -m "Pin auth-module to v1.5.0"
+git push
 ```
 
 ### Contributing Back to Modules
 
-If you fix a bug or improve a module, push changes back to the module repository:
+You can edit module code directly in your project and push to the module repository:
 
 ```bash
-# Example: You fixed a bug in auth-module
-git add modules/auth-module
-git commit -m "Fix: Auth token validation"
+# Make changes in the module
+cd modules/auth-module
+vim backend/pkg/auth/handlers.go
 
-# Push changes back to module repo
-git subtree push --prefix modules/auth-module https://github.com/yourcompany/fiber-auth-module main
+# Commit and push to module repo
+git add .
+git commit -m "Fix: Auth token validation"
+git push origin main
+
+# Update the pointer in template repo
+cd ../..
+git add modules/auth-module
+git commit -m "Update auth-module with bug fix"
+git push
 ```
 
 **When to push back:**
@@ -172,6 +208,9 @@ The recommended way to create a customer project is to **fork the template repos
 # Clone your fork
 git clone https://github.com/yourcompany/kunde-a-project.git
 cd kunde-a-project
+
+# Initialize submodules
+git submodule update --init --recursive
 
 # Add template as upstream (optional, for template updates)
 git remote add upstream https://github.com/yourcompany/template.git
@@ -233,11 +272,17 @@ Pull latest module updates:
 
 ```bash
 # Update a specific module
-git subtree pull --prefix modules/auth-module https://github.com/yourcompany/fiber-auth-module main --squash
-
-# Resolve conflicts if any
-git add .
+cd modules/auth-module
+git pull origin main
+cd ../..
+git add modules/auth-module
 git commit -m "Update auth-module to latest version"
+git push
+
+# Or update all modules at once
+git submodule update --remote
+git add modules/
+git commit -m "Update all modules"
 git push
 ```
 
@@ -512,7 +557,11 @@ git add .
 git commit -m "feat: Add customer-specific feature"
 
 # Pull module updates regularly
-git subtree pull --prefix modules/auth-module https://github.com/yourcompany/fiber-auth-module main --squash
+cd modules/auth-module
+git pull origin main
+cd ../..
+git add modules/auth-module
+git commit -m "Update auth-module"
 
 # Push to your fork
 git push origin customer/kunde-a
@@ -522,17 +571,31 @@ git push origin customer/kunde-a
 
 ## 🔧 Troubleshooting
 
-### "refusing to merge unrelated histories"
+### Submodules not cloned after git clone
 
-**Problem:** Git can't merge subtree updates.
+**Problem:** After cloning the repository, `modules/` directories are empty.
 
 **Solution:**
 ```bash
-# First time adding a module
-git subtree add --prefix modules/auth-module <url> main --squash
+# Initialize and clone all submodules
+git submodule update --init --recursive
+```
 
-# For updates, use pull (not add)
-git subtree pull --prefix modules/auth-module <url> main --squash
+### Submodule detached HEAD
+
+**Problem:** Submodule is in "detached HEAD" state after update.
+
+**Solution:**
+```bash
+# This is normal! Submodules point to specific commits.
+# To work on the module, checkout a branch:
+cd modules/auth-module
+git checkout main
+# Make changes, commit, push
+git push origin main
+cd ../..
+git add modules/auth-module
+git commit -m "Update auth-module pointer"
 ```
 
 ### Module import errors in Go
@@ -561,15 +624,23 @@ replace github.com/yourcompany/backend-core => ../../backend-core/backend
 }
 ```
 
-### Merge conflicts during subtree pull
+### Merge conflicts during module update
 
 **Problem:** Conflicts when pulling module updates.
 
 **Solution:**
-1. Resolve conflicts manually
-2. Mark as resolved: `git add <conflicted-files>`
-3. Continue merge: `git commit`
-4. Push: `git push`
+```bash
+cd modules/auth-module
+git pull origin main
+# Resolve conflicts in files
+git add .
+git commit -m "Resolve merge conflicts"
+git push origin main
+cd ../..
+git add modules/auth-module
+git commit -m "Update auth-module with conflict resolution"
+git push
+```
 
 ### Module removed but still in dependencies
 
@@ -585,7 +656,7 @@ replace github.com/yourcompany/backend-core => ../../backend-core/backend
 
 ## 📚 Additional Resources
 
-- [Git Subtree Documentation](https://git-scm.com/book/en/v2/Git-Tools-Subtrees)
+- [Git Submodules Documentation](https://git-scm.com/book/en/v2/Git-Tools-Submodules)
 - [Go Fiber Documentation](https://docs.gofiber.io/)
 - [Next.js Documentation](https://nextjs.org/docs)
 - [GitHub Fork Workflow](https://docs.github.com/en/get-started/quickstart/fork-a-repo)
