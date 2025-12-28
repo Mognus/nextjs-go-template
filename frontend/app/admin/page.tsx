@@ -2,9 +2,9 @@ import { AdminPanel } from "@/modules/admin-module/frontend/components/AdminPane
 import { fetchModels } from "@/modules/admin-module/frontend/lib/api-server";
 
 export default async function AdminPage() {
-  // Fetch initial data on server (SSR)
-  // This eliminates the loading state on initial page load
-  const initialModels = await fetchModels();
+    // Fetch initial data on server (SSR)
+    // This eliminates the loading state on initial page load
+    const initialModels = await fetchModels();
 
-  return <AdminPanel initialModels={initialModels} />;
+    return <AdminPanel initialModels={initialModels} />;
 }
