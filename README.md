@@ -426,6 +426,65 @@ module-name/
    }
    ```
 
+#### Frontend Module Development Setup
+
+If you're developing directly in a module's frontend code and your LSP/IDE doesn't recognize imports, you need to set up the module for development:
+
+**For each module with frontend code:**
+
+1. **Create symlink to node_modules:**
+   ```bash
+   cd modules/auth-module/frontend
+   ln -s ../../../frontend/node_modules node_modules
+   ```
+
+2. **Create tsconfig.json in the module:**
+   ```bash
+   cat > modules/auth-module/frontend/tsconfig.json << 'EOF'
+   {
+     "compilerOptions": {
+       "target": "ES2017",
+       "lib": ["dom", "dom.iterable", "esnext"],
+       "allowJs": true,
+       "skipLibCheck": true,
+       "strict": true,
+       "noEmit": true,
+       "esModuleInterop": true,
+       "module": "esnext",
+       "moduleResolution": "bundler",
+       "resolveJsonModule": true,
+       "isolatedModules": true,
+       "jsx": "preserve",
+       "incremental": true,
+       "baseUrl": ".",
+       "paths": {
+         "@/*": ["../../../frontend/*"],
+         "@/lib/*": ["../../../frontend/lib/*"],
+         "@/components/*": ["../../../frontend/components/*"],
+         "@/modules/*": ["../../*"]
+       }
+     },
+     "include": ["**/*.ts", "**/*.tsx"],
+     "exclude": ["node_modules"]
+   }
+   EOF
+   ```
+
+**Note:** These files are only for LSP/IDE support during development. At runtime, Next.js uses the main `frontend/tsconfig.json`.
+
+**Quick setup script for all modules:**
+```bash
+# Run from template root
+for module in modules/*/frontend; do
+  if [ -d "$module" ]; then
+    echo "Setting up $module..."
+    ln -sf ../../../frontend/node_modules "$module/node_modules"
+    # Copy tsconfig from auth-module as template
+    cp modules/auth-module/frontend/tsconfig.json "$module/tsconfig.json"
+  fi
+done
+```
+
 ---
 
 ## 💻 Development

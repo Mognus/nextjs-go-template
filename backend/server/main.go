@@ -9,6 +9,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -16,6 +17,7 @@ import (
 	// Module imports
 	"template/modules/auth/pkg/auth"
 	"template/modules/todo/todo"
+	"template/modules/admin/pkg/admin"
 )
 
 func main() {
@@ -32,8 +34,17 @@ func main() {
 
 	// Register modules
 	jwtSecret := getEnv("JWT_SECRET", "your-secret-key-change-in-production")
-	registry.Register(auth.New(db, jwtSecret))
-	registry.Register(todo.New(db))
+	authModule := auth.New(db, jwtSecret)
+	todoModule := todo.New(db)
+
+	registry.Register(authModule)
+	registry.Register(todoModule)
+
+	// Create and register admin module
+	adminModule := admin.New(db)
+	adminModule.RegisterCRUD(authModule) // Register auth CRUD provider
+	adminModule.RegisterCRUD(todoModule) // Register todo CRUD provider
+	registry.Register(adminModule)
 
 	// Run migrations
 	log.Println("Running database migrations...")
@@ -64,6 +75,19 @@ func main() {
 
 	// API routes
 	api := app.Group("/api")
+
+	// JWT middleware for protected routes
+	jwtMiddleware := jwtware.New(jwtware.Config{
+		SigningKey:  jwtware.SigningKey{Key: []byte(jwtSecret)},
+		TokenLookup: "header:Authorization,cookie:auth_token",
+	})
+
+	// Set JWT middleware in auth module
+	authModule.SetJWTMiddleware(jwtMiddleware)
+
+	// Set middlewares in admin module
+	// adminModule.SetJWTMiddleware(jwtMiddleware)
+	// adminModule.SetAdminMiddleware(authModule.RequireAdmin)
 
 	// Register all module routes
 	registry.RegisterAll(api)

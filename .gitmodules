@@ -7,3 +7,6 @@
 [submodule "modules/todo-module"]
 	path = modules/todo-module
 	url = git@github.com:Mognus/fiber-todo-test-plugin.git
+[submodule "modules/admin-module"]
+	path = modules/admin-module
+	url = git@github.com:Mognus/fiber-admin-module.git
