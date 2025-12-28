@@ -57,6 +57,7 @@ services:
     container_name: PROJECT_NAME-frontend
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:8080/api
+      API_URL: http://backend:8080/api
     ports:
       - "3000:3000"
     volumes:
